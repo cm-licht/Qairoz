@@ -1,28 +1,41 @@
-import ccxt
-from datetime import datetime
-import plotly.graph_objects as go
+from notifier.telegram import Notifier
 
-def main():
-    binance = ccxt.binance()
-    tradingPair = 'BTC/USDT'
+def test(configPath):
+    notifier = Notifier(configPath)
 
-    candles = binance.fetch_ohlcv(tradingPair, '1h')
+    success = notifier.send("Beep Boop")
 
-    dates = []
-    openData = []
-    highData = []
-    lowData = []
-    closeData = []
+    if success:
+        print("Success")
+    else:
+        print("Fail")
 
-    for candle in candles:
-        dates.append(datetime.fromtimestamp(candle[0] / 1000.0).strftime('%Y-%m-%d %H:%M:%S.%f'))
-        openData.append(candle[1])
-        highData.append(candle[2])
-        lowData.append(candle[3])
-        closeData.append(candle[4])
-
-    fig = go.Figure(data=[go.Candlestick(x=dates, open=openData, high=highData, low=lowData, close=closeData)])
-    fig.show()
+# import ccxt
+# from datetime import datetime
+# import plotly.graph_objects as go
+#
+# def main():
+#     binance = ccxt.binance()
+#     tradingPair = 'BTC/USDT'
+#
+#     candles = binance.fetch_ohlcv(tradingPair, '1h')
+#
+#     dates = []
+#     openData = []
+#     highData = []
+#     lowData = []
+#     closeData = []
+#
+#     for candle in candles:
+#         dates.append(datetime.fromtimestamp(candle[0] / 1000.0).strftime('%Y-%m-%d %H:%M:%S.%f'))
+#         openData.append(candle[1])
+#         highData.append(candle[2])
+#         lowData.append(candle[3])
+#         closeData.append(candle[4])
+#
+#     fig = go.Figure(data=[go.Candlestick(x=dates, open=openData, high=highData, low=lowData, close=closeData)])
+#     fig.show()
+#
 
 if __name__ == "__main__":
-    main()
+    test("config/configBot.json")
