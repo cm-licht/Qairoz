@@ -1,0 +1,7 @@
+{
+  "trading": {
+    "pair": "BTCUSDT",
+    "interval": "5m",
+    "timezone": "America/New_York"
+  }
+}
