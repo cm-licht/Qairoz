@@ -25,7 +25,7 @@ class Fibonacci:
         startOfTheDay = timeNow.replace(hour=0, minute=0, second=0, microsecond=0)
         startTs = int(startOfTheDay.astimezone(pytz.UTC).timestamp() * 1000)
 
-        klines = await client.get_klines(
+        klines = await client.futures_klines(
                 symbol=self.configSession["trading"]["pair"],
                 interval=self.configSession["trading"]["interval"],
                 startTime=startTs
@@ -80,22 +80,25 @@ class Fibonacci:
 
     def update_data(self, kline):
         self.check_new_day()
-
         k = kline['k']
+        currentTime = pd.to_datetime(k['t'], unit="ms").tz_localize("UTC").tz_convert(self.timezone)
         newRow = {
-            "date": pd.to_datetime(k['t'], unit="ms").tz_localize('UTC').tz_convert(self.timezone),
+            "date": currentTime,
             "open": float(k['o']),
             "high": float(k['h']),
             "low": float(k['l']),
             "close": float(k['c']),
             "volume": float(k['v'])
         }
-        newDf = pd.DataFrame([newRow]) 
         
         if self.df.empty:
-            self.df = newDf
+            self.df = pd.DataFrame([newRow])
         else:
-            self.df = pd.concat([self.df, pd.DataFrame([newRow])], ignore_index=True)
+            lastTime = self.df.iloc[-1]["date"]
+            if currentTime == lastTime:
+                self.df.iloc[-1] = newRow.values()
+            else:
+                self.df = pd.concat([self.df, pd.DataFrame([newRow])], ignore_index=True)
         
         self.process_logic(newRow)
 

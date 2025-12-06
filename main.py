@@ -7,10 +7,13 @@ from src.visualizer import Visualizer
 
 """
     Todo list:
-        1. Add deviation in 0.5 level
-        2. Add 0.236 and -0.236 level
-        3. Recheck price value == or != to data on TradingView
-        4. ...
+        1. Add deviation in 0.5 level + fix plan
+        2. Add notification when cross 0.236 level with proper market structure (export .png/.jpg to telegram)
+        
+        4. Store database
+        5. After eveything is aligned, execute trade at 0 and record to database + image
+        6. Reload too fast, increase interval
+        7. ...
         !!! FUTURE PLAN !!!
         Add higher time frame observer + 1/5/30 mins time frame ? maybe ? 
 """
@@ -34,7 +37,7 @@ async def main():
         return
 
     session = Fibonacci(configSession, configData)
-    viz = Visualizer()
+    viz = Visualizer(configSession["trading"]["pair"])
 
     apiKey = configData["binance"]["api_key"]
     apiSecret = configData["binance"]["api_secret"]
@@ -46,7 +49,7 @@ async def main():
 
     pair = configSession["trading"]["pair"]
     interval = configSession["trading"]["interval"]
-    ts = bm.kline_socket(pair, interval=interval)
+    ts = bm.kline_futures_socket(pair, interval=interval)
 
     print(f"Starting connection for {pair}")
 
